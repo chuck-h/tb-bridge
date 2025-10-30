@@ -1,7 +1,15 @@
 # tb-bridge
+(draft)
+
 Token bridge service between Telos and Base
 
-A backend API service intended for exchanging HYPHA v3 utility tokens on Base mainnet to Rainbow contract tokens on Telos and back. This API registers a correlation between a Telos account name and a Base account address.
+A backend API service intended for exchanging HYPHA v3 utility tokens on Base mainnet to Rainbow contract tokens on Telos and back. The service holds copies of several private keys in order to execute bridge transactions. Management of the bridge status occurs through the backend API service and a Telos smart contract.
+
+## Concept
+A pair of tokens, one on Telos mainnet and one on Base mainnet, are treated as equivalent, so that a user can interchange freely between them depending on the activities they are performing.
+A currency administrator registers a pair of tokens with the service, and provides liquidity into an escrow account on each chain.
+Each user registers with the service, attesting that they own a specific pair of accounts, one on each chain. Once the registration is successful, the service holds the user private key on Base and treats a signature on the Telos chain as authorizing a bridge action, which involves transfer transactions on both chains.
+Bridging is executed by transfer of tokens between the corresponding user accounts and escrow accounts.
 
 ## Features
 
@@ -42,6 +50,7 @@ Health check endpoint to verify API status and configuration.
 }
 ```
 
+
 ### `GET/POST /api/status`
 
 Check status without executing any transfers.
@@ -54,7 +63,7 @@ Check status without executing any transfers.
 **Example Request:**
 
 ```bash
-curl "https://<host>/api/status?telosAccount=mytelosaccount"
+curl "https://<host>/api/status?account=mytelosaccount"
 ```
 
 **Response:**
@@ -66,9 +75,9 @@ curl "https://<host>/api/status?telosAccount=mytelosaccount"
   "message": "matching account found",
   "data": {
     "matchrecord": {
-      "signedTelos": true,
-      "signedEth": true,
-      "telosAccount": "myaccount",
+      "authTelos": true,
+      "authEth": true,
+      "telosAccount": "mytelosaccount",
       "ethAddress": "0x1234567890123456789012345678901234567890",
     },
     "telosToken": {
@@ -84,15 +93,47 @@ curl "https://<host>/api/status?telosAccount=mytelosaccount"
   }
 }
 
-### `POST /api/transfer-hybrid`
+### `POST /api/convert`
 
-Execute conversion 
+Initiate conversion 
 
 **Request Body:**
 
 ```json
 {
-  "telosAccount": "myaccount",
-  "ethAddress": "0x1234567890123456789012345678901234567890"
+  "account": "mytelosaccount",
+  "amount": "10.0000 IKA",
+  "toTelos": true
 }
 ```
+
+**Response:**
+The response is an esr: uri, encoding a Telos transaction which must be signed and submitted by the user.
+
+### `POST /api/complete`
+
+Complete conversion 
+
+**Request Body:**
+
+```json
+{
+  "account": "mytelosaccount",
+  "amount": "10.0000 IKA",
+  "nonce": 123456
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "bridge transfer completed",
+  "data": {
+    "amount": "10.0000 IKA",
+    "ethTx": "0x1234567890123456789012345678901234567890",
+    "telosTx": "0x1234567890123456789012345678901234567890"
+  }
+}
+
