@@ -1,5 +1,5 @@
 # tb-bridge
-(draft)
+(draft, design revisions expected)
 
 Token bridge service between Telos and Base
 
