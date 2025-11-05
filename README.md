@@ -5,6 +5,36 @@ Token bridge service between Telos and Base
 
 A backend API service intended for exchanging HYPHA v3 utility tokens on Base mainnet to Rainbow contract tokens on Telos and back. The service holds copies of several private keys in order to execute bridge transactions. Management of the bridge status occurs through the backend API service and a Telos smart contract.
 
+# Hypha proposal
+
+We thought of a simpler scenario with Vlad that is achievable for the gathering. A few manual actions are required but we think this should be achievable in the context of the gathering as admins will be in person with the participants.
+
+### Accounts
+User create a Base account in Hypha v3 and a Telos account in the Seeds wallet
+We ask them to fill in an online form to indicate both their accounts (can be verified in the UI)
+
+### Tokens
+Spaces create their token in hypha v3
+We ask them to fill in an online form when token is voted on with the name of their space and token (can be verified in the UI)
+Tokens are then created by admins in the Rainbow seeds contract
+
+### From Base To Telos
+We create a space on Hypha called "Bridge Space", admins (such as yourself) will be members of this space
+We enable the hypha v3 wallet feature in the web user interface to send space tokens to this space.
+This space plays the role of the bridge ledger as admins can see all transactions in the treasury view
+When transfer is visible on the "Bridge Space", admins mint the same amount from rainbow seeds and send it to the user seeds wallet.
+
+### From Telos To Base
+When a transfer to rainbow seeds contract is done to migrate to back to base, the bridge space sends the token to the user using the deploy funds proposal.
+The user receives the amount in their base wallet
+
+### This would be an acceptable scenario from our point of view as limited manual actions:
+User: 1 short online form
+Space creator: 1 short online form
+Admin: easy way to monitor and limited transfers required
+
+# Original 
+
 ## Concept
 A pair of tokens, one on Telos mainnet and one on Base mainnet, are treated as equivalent, so that a user can interchange freely between them depending on the activities they are performing.
 A currency administrator registers a pair of tokens with the service, and provides liquidity into an escrow account on each chain.
